@@ -2,70 +2,77 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Definição da estrutura Carro, que contém os campos necessários para armazenar os dados de cada carro
 typedef struct {
-    char marca[20];   // Marca do carro (máximo de 20 caracteres)
-    char modelo[30];  // Modelo do carro (máximo de 30 caracteres)
-    int ano;          // Ano de fabricação do carro
-    int km;           // Quilometragem do carro
-    float valor;      // Valor do carro
+    char marca[20];
+    char modelo[30];
+    int ano;
+    int km;
+    float valor;
 } Carro;
 
+#define MAX_CARROS 1000
+
 int main() {
-    // Abre o arquivo CSV no modo de leitura
     FILE *csv = fopen("carros.csv", "r");
     if (!csv) {
-        perror("Erro ao abrir o arquivo carros.csv"); // Exibe erro caso o arquivo não seja encontrado
+        perror("Erro ao abrir o arquivo carros.csv");
         return 1;
     }
 
-    // Cria o arquivo binário no modo de escrita
+    Carro carros[MAX_CARROS];
+    int count = 0;
+    char linha[150];
+
+    while (fgets(linha, sizeof(linha), csv) && count < MAX_CARROS) {
+        linha[strcspn(linha, "\n")] = '\0';
+
+        Carro c;
+        char *token = strtok(linha, ",");
+        if (token) {
+            // pra remover aspas de marca
+            if (token[0] == '"') token++;
+            size_t len = strlen(token);
+            if (len > 0 && token[len - 1] == '"') token[len - 1] = '\0';
+            strncpy(c.marca, token, sizeof(c.marca) - 1);
+            c.marca[sizeof(c.marca) - 1] = '\0';
+        } else continue;
+
+        token = strtok(NULL, ",");
+        if (token) {
+            // pra remover aspas de modelo
+            if (token[0] == '"') token++;
+            size_t len = strlen(token);
+            if (len > 0 && token[len - 1] == '"') token[len - 1] = '\0';
+            strncpy(c.modelo, token, sizeof(c.modelo) - 1);
+            c.modelo[sizeof(c.modelo) - 1] = '\0';
+        } else continue;
+
+        token = strtok(NULL, ",");
+        if (token) c.ano = atoi(token);
+        else continue;
+
+        token = strtok(NULL, ",");
+        if (token) c.km = atoi(token);
+        else continue;
+
+        token = strtok(NULL, ",");
+        if (token) c.valor = atof(token);
+        else continue;
+
+        carros[count++] = c;
+    }
+    fclose(csv);
+
     FILE *bin = fopen("carros.bin", "wb");
     if (!bin) {
-        perror("Erro ao criar o arquivo carros.bin"); // Exibe erro caso o arquivo binário não possa ser criado
-        fclose(csv);
+        perror("Erro ao criar o arquivo carros.bin");
         return 1;
     }
 
-    char linha[150]; // Buffer para armazenar cada linha do arquivo CSV
-    while (fgets(linha, sizeof(linha), csv)) { // Lê cada linha do arquivo CSV
-        linha[strcspn(linha, "\n")] = '\0'; // Remove o caractere de nova linha, se existir
-
-        Carro c; // Instância da estrutura Carro para armazenar os dados da linha atual
-
-        // Divide a linha do CSV em tokens separados por vírgulas
-        char *token = strtok(linha, ",");
-        if (token) strncpy(c.marca, token, sizeof(c.marca) - 1); // Copia a marca
-        else continue;
-
-        token = strtok(NULL, ",");
-        if (token) strncpy(c.modelo, token, sizeof(c.modelo) - 1); // Copia o modelo
-        else continue;
-
-        token = strtok(NULL, ",");
-        if (token) c.ano = atoi(token); // Converte o ano para inteiro
-        else continue;
-
-        token = strtok(NULL, ",");
-        if (token) c.km = atoi(token); // Converte a quilometragem para inteiro
-        else continue;
-
-        token = strtok(NULL, ",");
-        if (token) c.valor = atof(token); // Converte o valor para float
-        else continue;
-
-        // Garante que as strings terminem com '\0'
-        c.marca[sizeof(c.marca) - 1] = '\0';
-        c.modelo[sizeof(c.modelo) - 1] = '\0';
-
-        // Escreve a estrutura Carro no arquivo binário
-        fwrite(&c, sizeof(Carro), 1, bin);
-    }
-
-    // Fecha os arquivos
-    fclose(csv);
+    fwrite(&count, sizeof(int), 1, bin);
+    fwrite(carros, sizeof(Carro), count, bin);
     fclose(bin);
 
-    printf("Arquivo carros.bin gerado com sucesso!\n"); // Mensagem de sucesso
+    printf("Arquivo carros.bin gerado com sucesso com %d registros!\n", count);
     return 0;
 }
