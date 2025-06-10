@@ -1,13 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "carros.h"
 
-typedef struct {
-    char marca[20];
-    char modelo[30];
-    int ano;
-    int km;
-    float valor;
-} Carro;
+// Remove a definição de 'Carro' daqui, já está no carros.h
 
 Carro* ler_carros_binario(const char *nome_arquivo, int *quantidade) {
     FILE *f = fopen(nome_arquivo, "rb");
@@ -49,13 +44,16 @@ void imprimir_carro(const Carro *c) {
     printf("%-20s %-30s %-6d %-10d %10.2f\n", c->marca, c->modelo, c->ano, c->km, c->valor);
 }
 
-extern Carro* ler_carros_binario(const char *nome_arquivo, int *quantidade);
+int main(int argc, char *argv[]) {
+    system("chcp 65001"); // para acentos funcionarem no Windows
 
-int main() {
-    system("chcp 65001"); // para os acentos funcionarem
+    if (argc < 2) {
+        printf("Uso: %s <arquivo_binario>\n", argv[0]);
+        return 1;
+    }
 
     int qtd;
-    Carro *carros = ler_carros_binario("carros.bin", &qtd);
+    Carro *carros = ler_carros_binario(argv[1], &qtd);
     if (!carros) return 1;
 
     imprimir_cabecalho();
