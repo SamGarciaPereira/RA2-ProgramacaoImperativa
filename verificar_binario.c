@@ -28,7 +28,6 @@ int main() {
     printf("%-20s %-30s %-10s %-10s %-10s\n", "Marca", "Modelo", "Ano", "KM", "Valor");
     printf("--------------------------------------------------------------------------------------\n");
 
-    // ✅ PASSO 2: Ler exatamente a quantidade de carros que o arquivo diz ter
     for (int i = 0; i < quantidade_de_carros; i++) {
         // Lê um registro de Carro do arquivo
         if (fread(&c, sizeof(Carro), 1, bin)) {
