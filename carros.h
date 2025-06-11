@@ -206,6 +206,7 @@ void imprimir_menu()
     printf("1) Exibir todos os carros\n");
     printf("2) Buscar modelo por substring (ordenado por preço)\n");
     printf("3) Buscar por ano\n");
+    printf("4) Buscar por kilometragem\n");
     printf("6) Sair\n");
     printf("Escolha uma opção: ");
 }
@@ -351,6 +352,19 @@ NoArvore *inserir_km(NoArvore *raiz, int km, Carro *carro)
 
     return raiz;
 }
+
+void exibir_km_intervalo(NoArvore *raiz, int min_km, int max_km) {
+    if (!raiz) return;
+
+    exibir_km_intervalo(raiz->esq, min_km, max_km);
+
+    if (raiz->chave_int >= min_km && raiz->chave_int <= max_km) {
+        imprimir_carro(raiz->carro);
+    }
+
+    exibir_km_intervalo(raiz->dir, min_km, max_km);
+}
+
 
 NoArvore *inserir_preco(NoArvore *raiz, float valor, Carro *carro)
 {
