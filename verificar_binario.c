@@ -13,8 +13,6 @@ int main() {
     // Variável para armazenar a quantidade de carros lida do arquivo
     int quantidade_de_carros;
 
-    // ✅ PASSO 1: Ler o número inteiro do início do arquivo
-    // Isso é o que estava faltando!
     if (fread(&quantidade_de_carros, sizeof(int), 1, bin) != 1) {
         fprintf(stderr, "Erro ao ler a quantidade de carros do arquivo.\n");
         fclose(bin);
@@ -30,7 +28,6 @@ int main() {
     printf("%-20s %-30s %-10s %-10s %-10s\n", "Marca", "Modelo", "Ano", "KM", "Valor");
     printf("--------------------------------------------------------------------------------------\n");
 
-    // ✅ PASSO 2: Ler exatamente a quantidade de carros que o arquivo diz ter
     for (int i = 0; i < quantidade_de_carros; i++) {
         // Lê um registro de Carro do arquivo
         if (fread(&c, sizeof(Carro), 1, bin)) {

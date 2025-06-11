@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "indexacao.h"
+#include "indexacaonovo.h"
 
 NoAno* criar_lista_de_ano(Carro *carros, int qtd) {
     NoAno *lista = NULL;
