@@ -88,7 +88,9 @@ int main(int argc, char *argv[])
             printf("Opção inválida.\n");
         }
     } while (tolower(opcao) != '6');
-
+    liberar_lista_ano(lista_de_ano); 
+    liberar_arvore(arvore_km);        
+    liberar_arvore(arvore_preco);
     free(carros); // Libera memória alocada
     return 0;
 }
