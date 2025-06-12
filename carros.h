@@ -1,48 +1,80 @@
 #ifndef CARROS_H
 #define CARROS_H
 
+/*
+ * Definição da estrutura Carro, que representa um veículo com marca, modelo, ano, km e valor.
+ */
 typedef struct
 {
-    char marca[20];
-    char modelo[30];
-    int ano;
-    int km;
-    float valor;
+    char marca[20];  // Marca do carro
+    char modelo[30]; // Modelo do carro
+    int ano;         // Ano de fabricação
+    int km;          // Quilometragem
+    float valor;     // Preço do carro
 } Carro;
 
+/*
+ * Estruturas para listas encadeadas de carros agrupados por ano.
+ */
 typedef struct NoCarroAno
 {
-    Carro *carro;
-    struct NoCarroAno *prox;
+    Carro *carro;            // Ponteiro para o carro
+    struct NoCarroAno *prox; // Próximo nó da lista de carros do mesmo ano
 } NoCarroAno;
 
 typedef struct NoAno
 {
-    int ano;
-    NoCarroAno *carros_do_ano;
-    struct NoAno *prox;
+    int ano;                   // Ano de referência
+    NoCarroAno *carros_do_ano; // Lista de carros desse ano
+    struct NoAno *prox;        // Próximo nó da lista de anos
 } NoAno;
 
+/*
+ * Estrutura para árvore binária de busca, usada para indexar carros por km ou valor.
+ */
 typedef struct NoArvore
 {
-    int chave_int;
-    float chave_float;
-    Carro *carro;
-    struct NoArvore *esq, *dir;
+    int chave_int;              // Chave inteira (ex: km)
+    float chave_float;          // Chave float (ex: valor)
+    Carro *carro;               // Ponteiro para o carro
+    struct NoArvore *esq, *dir; // Filhos esquerdo e direito
 } NoArvore;
 
+/*
+ * Lê carros de um arquivo CSV e armazena no vetor carros.
+ * Retorna a quantidade lida ou -1 em caso de erro.
+ */
 int ler_carros_csv(const char *nome_csv, Carro carros[], int max_carros);
+
+/*
+ * Salva o vetor de carros em um arquivo binário.
+ * Retorna 0 em sucesso ou -1 em erro.
+ */
 int salvar_carros_binario(const char *nome_bin, Carro carros[], int quantidade);
 
+/*
+ * Lê carros de um arquivo binário, aloca dinamicamente e retorna ponteiro para o vetor.
+ * Armazena a quantidade lida em *quantidade.
+ */
 Carro *ler_carros_binario(const char *nome_arquivo, int *quantidade);
+
+/*
+ * Imprime o cabeçalho da tabela de carros.
+ */
 void imprimir_cabecalho();
+
+/*
+ * Imprime os dados de um carro formatados.
+ */
 void imprimir_carro(const Carro *c);
 
-/*FUNÇÕES P1*/
+/* --- FUNÇÕES P1 --- */
 
-#define MAX_CARROS 1000
+#define MAX_CARROS 1000 // Quantidade máxima de carros suportada
 
-// Função auxiliar para remover aspas do início e do fim da string
+/*
+ * Remove aspas do início e fim de um token de string.
+ */
 void remover_aspas_token(char *token)
 {
     if (token[0] == '"')
@@ -52,6 +84,10 @@ void remover_aspas_token(char *token)
         token[len - 1] = '\0';
 }
 
+/*
+ * Lê carros de um arquivo CSV, tratando aspas e separadores.
+ * Preenche o vetor carros e retorna a quantidade lida.
+ */
 int ler_carros_csv(const char *nome_csv, Carro carros[], int max_carros)
 {
     FILE *csv = fopen(nome_csv, "r");
@@ -72,12 +108,12 @@ int ler_carros_csv(const char *nome_csv, Carro carros[], int max_carros)
         char *token = strtok(linha, ",");
         if (token)
         {
-            // remover aspas e copiar para marca
+            // Remover aspas e copiar para marca
             if (token[0] == '"')
-                token++; // avança o ponteiro se começar com aspas
+                token++;
             size_t len = strlen(token);
             if (len > 0 && token[len - 1] == '"')
-                token[len - 1] = '\0'; // remove aspas do final
+                token[len - 1] = '\0';
             strncpy(c.marca, token, sizeof(c.marca) - 1);
             c.marca[sizeof(c.marca) - 1] = '\0';
         }
@@ -87,7 +123,7 @@ int ler_carros_csv(const char *nome_csv, Carro carros[], int max_carros)
         token = strtok(NULL, ",");
         if (token)
         {
-            // remover aspas e copiar para modelo
+            // Remover aspas e copiar para modelo
             if (token[0] == '"')
                 token++;
             size_t len = strlen(token);
@@ -124,6 +160,10 @@ int ler_carros_csv(const char *nome_csv, Carro carros[], int max_carros)
     return count;
 }
 
+/*
+ * Salva o vetor de carros em um arquivo binário.
+ * Escreve primeiro a quantidade, depois os dados dos carros.
+ */
 int salvar_carros_binario(const char *nome_bin, Carro carros[], int quantidade)
 {
     FILE *bin = fopen(nome_bin, "wb");
@@ -151,8 +191,12 @@ int salvar_carros_binario(const char *nome_bin, Carro carros[], int quantidade)
     return 0;
 }
 
-/*FUNÇÕES P2*/
+/* --- FUNÇÕES P2 --- */
 
+/*
+ * Lê carros de um arquivo binário, alocando dinamicamente o vetor.
+ * Retorna ponteiro para o vetor ou NULL em erro.
+ */
 Carro *ler_carros_binario(const char *nome_arquivo, int *quantidade)
 {
     FILE *f = fopen(nome_arquivo, "rb");
@@ -189,19 +233,28 @@ Carro *ler_carros_binario(const char *nome_arquivo, int *quantidade)
     return carros;
 }
 
+/*
+ * Imprime o cabeçalho da tabela de carros.
+ */
 void imprimir_cabecalho()
 {
     printf("%-20s %-30s %-6s %-10s %-10s\n", "Marca", "Modelo", "Ano", "Kilometragem", "Preço (R$)");
     printf("-------------------------------------------------------------------------------------\n");
 }
 
+/*
+ * Imprime um carro formatado.
+ */
 void imprimir_carro(const Carro *c)
 {
     printf("%-20s %-30s %-6d %-10d %10.2f\n", c->marca, c->modelo, c->ano, c->km, c->valor);
 }
 
+/*
+ * Exibe o menu principal do programa.
+ */
 void imprimir_menu()
-{ // menu criado
+{
     printf("\nMenu:\n");
     printf("1) Exibir todos os carros\n");
     printf("2) Buscar modelo por substring (ordenado por preço)\n");
@@ -212,25 +265,25 @@ void imprimir_menu()
     printf("Escolha uma opção: ");
 }
 
+/*
+ * Função de comparação para qsort, ordena carros por preço crescente.
+ */
 int comparar_por_preco(const void *a, const void *b)
 {
     Carro *c1 = (Carro *)a;
     Carro *c2 = (Carro *)b;
 
     if (c1->valor < c2->valor)
-    {
-        return -1; // c1 é mais barato
-    }
+        return -1;
     else if (c1->valor > c2->valor)
-    {
-        return 1; // c1 é mais caro
-    }
+        return 1;
     else
-    {
-        return 0; // iguais
-    }
+        return 0;
 }
 
+/*
+ * Busca carros cujo modelo contém uma substring (case-insensitive), ordena por preço e exibe.
+ */
 void buscar_por_substring(Carro *carros, int qtd)
 {
     char substr[50];
@@ -282,8 +335,11 @@ void buscar_por_substring(Carro *carros, int qtd)
     free(resultado);
 }
 
+/*
+ * Lista carros com ano maior ou igual ao informado.
+ */
 void lista_de_ano(Carro *carros, int qtd)
-{ // função que pega como parametro o vetor de carros e a quantidade de carros
+{
     int ano_limite;
     printf("Digite o ano mínimo: ");
     scanf("%d", &ano_limite);
@@ -305,6 +361,10 @@ void lista_de_ano(Carro *carros, int qtd)
     }
 }
 
+/*
+ * Cria uma lista encadeada de anos, cada um com sua lista de carros.
+ * Retorna ponteiro para o início da lista.
+ */
 NoAno *criar_lista_de_ano(Carro *carros, int qtd)
 {
     NoAno *lista = NULL;
@@ -314,12 +374,14 @@ NoAno *criar_lista_de_ano(Carro *carros, int qtd)
         int ano = carros[i].ano;
         NoAno *atual = lista, *anterior = NULL;
 
+        // Busca se já existe o ano na lista
         while (atual && atual->ano != ano)
         {
             anterior = atual;
             atual = atual->prox;
         }
 
+        // Se não existe, cria novo nó de ano
         if (!atual)
         {
             NoAno *novo_ano = malloc(sizeof(NoAno));
@@ -335,6 +397,7 @@ NoAno *criar_lista_de_ano(Carro *carros, int qtd)
             atual = novo_ano;
         }
 
+        // Insere o carro na lista de carros do ano
         NoCarroAno *novo_carro = malloc(sizeof(NoCarroAno));
         novo_carro->carro = &carros[i];
         novo_carro->prox = atual->carros_do_ano;
@@ -344,6 +407,10 @@ NoAno *criar_lista_de_ano(Carro *carros, int qtd)
     return lista;
 }
 
+/*
+ * Insere um carro em uma árvore binária de busca por km.
+ * Retorna a nova raiz da árvore.
+ */
 NoArvore *inserir_km(NoArvore *raiz, int km, Carro *carro)
 {
     if (!raiz)
@@ -363,6 +430,9 @@ NoArvore *inserir_km(NoArvore *raiz, int km, Carro *carro)
     return raiz;
 }
 
+/*
+ * Exibe carros na árvore de km cujo valor está no intervalo [min_km, max_km].
+ */
 void exibir_km_intervalo(NoArvore *raiz, int min_km, int max_km)
 {
     if (!raiz)
@@ -378,6 +448,10 @@ void exibir_km_intervalo(NoArvore *raiz, int min_km, int max_km)
     exibir_km_intervalo(raiz->dir, min_km, max_km);
 }
 
+/*
+ * Insere um carro em uma árvore binária de busca por valor.
+ * Retorna a nova raiz da árvore.
+ */
 NoArvore *inserir_preco(NoArvore *raiz, float valor, Carro *carro)
 {
     if (!raiz)
@@ -397,6 +471,9 @@ NoArvore *inserir_preco(NoArvore *raiz, float valor, Carro *carro)
     return raiz;
 }
 
+/*
+ * Exibe carros na árvore de valor cujo preço está no intervalo [min_preco, max_preco].
+ */
 void exibir_preco_intervalo(NoArvore *raiz, int min_preco, int max_preco)
 {
     if (!raiz)
@@ -404,7 +481,7 @@ void exibir_preco_intervalo(NoArvore *raiz, int min_preco, int max_preco)
 
     exibir_preco_intervalo(raiz->esq, min_preco, max_preco);
 
-    if (raiz->carro->valor >= min_preco && raiz->carro->valor <= max_preco)
+    if (raiz->carro && raiz->carro->valor >= min_preco && raiz->carro->valor <= max_preco)
     {
         imprimir_carro(raiz->carro);
     }
@@ -412,8 +489,14 @@ void exibir_preco_intervalo(NoArvore *raiz, int min_preco, int max_preco)
     exibir_preco_intervalo(raiz->dir, min_preco, max_preco);
 }
 
+/*
+ * Libera toda a memória alocada para a lista de anos e suas listas de carros.
+ */
 void liberar_lista_ano(NoAno *lista)
 {
+    if (!lista)
+        return;
+
     while (lista)
     {
         NoCarroAno *c = lista->carros_do_ano;
@@ -429,13 +512,17 @@ void liberar_lista_ano(NoAno *lista)
     }
 }
 
+/*
+ * Libera toda a memória alocada para a árvore binária.
+ */
 void liberar_arvore(NoArvore *raiz)
 {
-    if (!raiz)
+    if (raiz == NULL)
         return;
+
     liberar_arvore(raiz->esq);
     liberar_arvore(raiz->dir);
     free(raiz);
 }
 
-#endif
+#endif // CARROS_H
