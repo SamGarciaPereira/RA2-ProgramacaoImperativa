@@ -17,11 +17,14 @@ int main(int argc, char *argv[])
     int qtd;
     Carro *carros = ler_carros_binario(argv[1], &qtd);
     NoArvore *arvore_km = NULL;
+    NoArvore *arvore_preco = NULL;
 
     if (!carros)
         return 1;
-    for (int i = 0; i < qtd; i++) {
+    for (int i = 0; i < qtd; i++)
+    {
         arvore_km = inserir_km(arvore_km, carros[i].km, &carros[i]);
+        arvore_preco = inserir_preco(arvore_preco, carros[i].valor, &carros[i]);
     }
 
     char opcao;
@@ -46,25 +49,32 @@ int main(int argc, char *argv[])
             lista_de_ano(carros, qtd);
             break;
         case '4':
-            int min, max;
-            printf("Digite a kilometragem mínima: ");
-            scanf("%d", &min);
-            printf("Digite a kilometragem máxima: ");
-            scanf("%d", &max);
-
-            printf("\nCarros com kilometragem entre %d e %d:\n\n", min, max);
-            imprimir_cabecalho();
-            exibir_km_intervalo(arvore_km, min, max);
+        {
+            int min_km, max_km;
+            printf("Digite o valor mínimo de km: ");
+            scanf("%d", &min_km);
+            printf("Digite o valor máximo de km: ");
+            scanf("%d", &max_km);
+            exibir_km_intervalo(arvore_km, min_km, max_km);
             break;
+        }
+        case '5':
+        {
+            int min_preco, max_preco;
+            printf("Digite o valor mínimo: ");
+            scanf("%d", &min_preco);
+            printf("Digite o valor máximo: ");
+            scanf("%d", &max_preco);
+            exibir_preco_intervalo(arvore_preco, min_preco, max_preco);
+            break;
+        }
         case '6':
             printf("Encerrando...\n");
             break;
         default:
             printf("Opção inválida.\n");
         }
-    }
-
-    while (tolower(opcao) != '6');
+    } while (tolower(opcao) != '6');
 
     free(carros);
     return 0;

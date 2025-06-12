@@ -207,6 +207,7 @@ void imprimir_menu()
     printf("2) Buscar modelo por substring (ordenado por preço)\n");
     printf("3) Buscar por ano\n");
     printf("4) Buscar por kilometragem\n");
+    printf("5) Buscar por preço\n");
     printf("6) Sair\n");
     printf("Escolha uma opção: ");
 }
@@ -231,27 +232,36 @@ int comparar_por_preco(const void *a, const void *b)
 }
 
 void buscar_por_substring(Carro *carros, int qtd)
-{ // função que pega como parametro o vetor de carros e a quantidade de carros
-
+{
     char substr[50];
     printf("Digite a substring do modelo: ");
-    scanf(" %[^\n]", substr); // lê a substring (permite espaços)
+    scanf(" %[^\n]", substr);
 
-    Carro *resultado = malloc(sizeof(Carro) * qtd); // aloca memória para o vetor de resultados
+    // Converter substring para minúsculo
+    for (int i = 0; substr[i]; i++)
+        substr[i] = tolower(substr[i]);
+
+    Carro *resultado = malloc(sizeof(Carro) * qtd);
     if (resultado == NULL)
     {
         printf("Erro ao alocar memória.\n");
         return;
     }
 
-    int count = 0; // quantos carros foram encontrados
-
+    int count = 0;
     for (int i = 0; i < qtd; i++)
     {
-        if (strstr(carros[i].modelo, substr))
+        char modelo_lower[30];
+        strncpy(modelo_lower, carros[i].modelo, sizeof(modelo_lower) - 1);
+        modelo_lower[sizeof(modelo_lower) - 1] = '\0';
+        // Converter modelo para minúsculo
+        for (int j = 0; modelo_lower[j]; j++)
+            modelo_lower[j] = tolower(modelo_lower[j]);
+
+        if (strstr(modelo_lower, substr))
         {
-            resultado[count] = carros[i]; // guarda o carro encontrado
-            count++;                      // aumenta o número de encontrados
+            resultado[count] = carros[i];
+            count++;
         }
     }
 
@@ -353,18 +363,20 @@ NoArvore *inserir_km(NoArvore *raiz, int km, Carro *carro)
     return raiz;
 }
 
-void exibir_km_intervalo(NoArvore *raiz, int min_km, int max_km) {
-    if (!raiz) return;
+void exibir_km_intervalo(NoArvore *raiz, int min_km, int max_km)
+{
+    if (!raiz)
+        return;
 
     exibir_km_intervalo(raiz->esq, min_km, max_km);
 
-    if (raiz->chave_int >= min_km && raiz->chave_int <= max_km) {
+    if (raiz->chave_int >= min_km && raiz->chave_int <= max_km)
+    {
         imprimir_carro(raiz->carro);
     }
 
     exibir_km_intervalo(raiz->dir, min_km, max_km);
 }
-
 
 NoArvore *inserir_preco(NoArvore *raiz, float valor, Carro *carro)
 {
@@ -383,6 +395,21 @@ NoArvore *inserir_preco(NoArvore *raiz, float valor, Carro *carro)
         raiz->dir = inserir_preco(raiz->dir, valor, carro);
 
     return raiz;
+}
+
+void exibir_preco_intervalo(NoArvore *raiz, int min_preco, int max_preco)
+{
+    if (!raiz)
+        return;
+
+    exibir_preco_intervalo(raiz->esq, min_preco, max_preco);
+
+    if (raiz->carro->valor >= min_preco && raiz->carro->valor <= max_preco)
+    {
+        imprimir_carro(raiz->carro);
+    }
+
+    exibir_preco_intervalo(raiz->dir, min_preco, max_preco);
 }
 
 void liberar_lista_ano(NoAno *lista)
